@@ -482,8 +482,116 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
     
     pylab.show()
 
+def simulationWithDrugDelay(numViruses, maxPop, maxBirthProb, clearProb, resistances,
+                       mutProb, numTrials, delay):
+    """
+    Runs simulations and plots graphs for problem 5.
 
+    For each of numTrials trials, instantiates a patient, runs a simulation for
+    150 timesteps, adds guttagonol, and runs the simulation for an additional
+    150 timesteps.  At the end plots the average virus population size
+    (for both the total virus population and the guttagonol-resistant virus
+    population) as a function of time.
 
+    numViruses: number of ResistantVirus to create for patient (an integer)
+    maxPop: maximum virus population for patient (an integer)
+    maxBirthProb: Maximum reproduction probability (a float between 0-1)        
+    clearProb: maximum clearance probability (a float between 0-1)
+    resistances: a dictionary of drugs that each ResistantVirus is resistant to
+                 (e.g., {'guttagonol': False})
+    mutProb: mutation probability for each ResistantVirus particle
+             (a float between 0-1). 
+    numTrials: number of simulation runs to execute (an integer)
+    delay: number of timesteps before drug is given
+    
+    """
+
+    drug = 'guttagonol'
+    t = range(150)
+    counts = [0 for _ in xrange(numTrials)]
+
+    for trial in range(numTrials):
+        viruses = [ResistantVirus(maxBirthProb, clearProb, resistances, mutProb) for _ in range(numViruses)]
+        patient = TreatedPatient(viruses, maxPop)
+        final = 0
+        
+        for i in xrange(delay):
+            final = patient.update()
+
+        patient.addPrescription(drug)
+        
+        for i in t:
+            final = patient.update()
+
+        counts[trial] = final   
+    
+    print sum([1 for x in counts if x == 0]) / float(numTrials)
+    pylab.hist(counts, histtype='bar', rwidth=0.8)
+
+    pylab.title('Drug Trials with Delay')
+    pylab.xlabel('Final Virus Count')
+    pylab.ylabel('Frequency')
+    
+    pylab.show()
+
+def simulationWith2DrugDelay(numViruses, maxPop, maxBirthProb, clearProb, resistances,
+                       mutProb, numTrials, delay):
+    """
+    Runs simulations and plots graphs for problem 5.
+
+    For each of numTrials trials, instantiates a patient, runs a simulation for
+    150 timesteps, adds guttagonol, and runs the simulation for an additional
+    150 timesteps.  At the end plots the average virus population size
+    (for both the total virus population and the guttagonol-resistant virus
+    population) as a function of time.
+
+    numViruses: number of ResistantVirus to create for patient (an integer)
+    maxPop: maximum virus population for patient (an integer)
+    maxBirthProb: Maximum reproduction probability (a float between 0-1)        
+    clearProb: maximum clearance probability (a float between 0-1)
+    resistances: a dictionary of drugs that each ResistantVirus is resistant to
+                 (e.g., {'guttagonol': False})
+    mutProb: mutation probability for each ResistantVirus particle
+             (a float between 0-1). 
+    numTrials: number of simulation runs to execute (an integer)
+    delay: number of timesteps before drug is given
+    
+    """
+
+    drug1 = 'guttagonol'
+    drug2 = 'grimpex'
+    t = range(150)
+    counts = [0 for _ in xrange(numTrials)]
+
+    for trial in range(numTrials):
+        viruses = [ResistantVirus(maxBirthProb, clearProb, resistances, mutProb) for _ in range(numViruses)]
+        patient = TreatedPatient(viruses, maxPop)
+        final = 0
+        
+        for i in t:
+            final = patient.update()
+
+        patient.addPrescription(drug1)        
+
+        for i in xrange(delay):
+            final = patient.update()
+
+        patient.addPrescription(drug2)
+        
+        for i in t:
+            final = patient.update()
+
+        counts[trial] = final   
+    
+    print sum([1 for x in counts if x == 0]) / float(numTrials)
+    pylab.hist(counts, histtype='bar', rwidth=0.8)
+
+    pylab.title('2-Drug Trials with Delay')
+    pylab.xlabel('Final Virus Count')
+    pylab.ylabel('Frequency')
+    
+    pylab.show()
+    
 def TestRv():
     result = []
     virus = ResistantVirus(1.0, 0.0, {'drug1':True, 'drug2': True, 'drug3': True, 'drug4': True, 'drug5': True, 'drug6': True}, 0.5)
